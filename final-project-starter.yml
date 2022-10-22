@@ -207,9 +207,7 @@ Resources:
       Type: AWS::EC2::SecurityGroup
       Properties:
         GroupDescription: Allow http to our load balancer
-        VpcId:
-          Fn::ImportValue:
-            !Sub "${EnvironmentName}-VPCID"
+        VpcId: !Ref VPC
         SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -224,9 +222,7 @@ Resources:
       Type: AWS::EC2::SecurityGroup
       Properties:
         GroupDescription: Allow http to our hosts and SSH from local only
-        VpcId:
-          Fn::ImportValue:
-            !Sub "${EnvironmentName}-VPCID"
+        VpcId: !Ref VPC
         SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -261,8 +257,8 @@ Resources:
         Type: AWS::AutoScaling::AutoScalingGroup
         Properties:
           VPCZoneIdentifier:
-          - Fn::ImportValue: 
-              !Sub "${EnvironmentName}-PRIV-NETS"
+            - !Ref PrivateSubnet1
+            - !Ref PrivateSubnet2
           LaunchConfigurationName:
             Ref: WebAppLaunchConfig
           MinSize: '2'
@@ -272,9 +268,9 @@ Resources:
     WebAppLB:
         Type: AWS::ElasticLoadBalancingV2::LoadBalancer
         Properties:
-          Subnets:
-          - Fn::ImportValue: !Sub "${EnvironmentName}-PUB1-SN"
-          - Fn::ImportValue: !Sub "${EnvironmentName}-PUB2-SN"
+          Subnets:          
+            - !Ref PublicSubnet1
+            - !Ref PublicSubnet2
           SecurityGroups:
           - Ref: LBSecGroup
     Listener:
@@ -310,9 +306,7 @@ Resources:
         Port: 80
         Protocol: HTTP
         UnhealthyThresholdCount: 5
-        VpcId: 
-          Fn::ImportValue:
-            Fn::Sub: "${EnvironmentName}-VPCID"
+        VpcId: !Ref VPC
 Outputs: 
   # This is also optional.
   # Bonus points for useful outputs!
