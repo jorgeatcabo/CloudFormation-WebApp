@@ -1,11 +1,13 @@
 ### Project Title - Deploy a high-availability web app using CloudFormation
-This folder provides the starter code for the "ND9991 - C2- Infrastructure as Code - Deploy a high-availability web app using CloudFormation" project. This folder contains the following files:
 ![Diagram](CloudFormation-WebApp.png)
 
 #### final-project-starter.yml
-Students have to write the CloudFormation code using this YAML template for building the cloud infrastructure, as required for the project. 
+This YAML template is for building the cloud infrastructure. 
 
 #### server-parameters.json
-Students may use a JSON file for increasing the generic nature of the YAML code. For example, the JSON file contains a "ParameterKey" as "EnvironmentName" and "ParameterValue" as "UdacityProject". 
+This JSON file contains several paramaters as "EnvironmentName", "VpcCIDR","PublicSubnet1CIDR", "PublicSubnet2CIDR", "PrivateSubnet1CIDR" and "PrivateSubnet2CIDR" to be used in the YAML code.
+For instance the `${EnvironmentName}` would be substituted with `UdacityProject`.
 
-In YAML code, the `${EnvironmentName}` would be substituted with `UdacityProject` accordingly.
+### Running the code
+From VS Code terminal:  .\create.sh UdacityProject final-project-starter.yml server-parameters.json
+From GtiBash: bash create.sh UdacityProject final-project-starter.yml server-parameters.json
