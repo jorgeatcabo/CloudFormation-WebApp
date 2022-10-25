@@ -233,22 +233,55 @@ Resources:
           FromPort: 0
           ToPort: 65535
           CidrIp: 0.0.0.0/0
+
+    SRS3ReadOnlyEC2:
+        Type: "AWS::IAM::Role"
+        Properties:
+          AssumeRolePolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Principal:
+                  Service:
+                    - ec2.amazonaws.com
+                Action:
+                  - "sts:AssumeRole"
+          Path: /
+          Policies:
+            - PolicyName: WebServersS3ReadRole
+              PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                  - Effect: "Allow"
+                    Action:
+                      - S3:List*
+                      - S3:Get*
+                    Resource: "*"
+  
+    ProfileWithRolesForOurApp:
+      Type: AWS::IAM::InstanceProfile
+      Properties: 
+        Roles:
+          - !Ref SRS3ReadOnlyEC2
+
     WebAppLaunchConfig:
       Type: AWS::AutoScaling::LaunchConfiguration
       Properties:
+        IamInstanceProfile: !Ref ProfileWithRolesForOurApp
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash
             sudo apt-get update -y
             sudo apt-get install apache2 -y
-            sudo systemctl start apache2.service          
+            sudo systemctl start apache2.service
+            cd /var/www/html
+            aws s3 cp s3://storage-and-databases-exercise-2-182620489580/index.html .
         # ToDo: AMI ID of Ubuntu Linux machine. Too get one, try creating a VM from the web console. 
         ImageId: ami-0747bdcabd34c712a
         # ToDo: Change the key-pair name, as applicable to you. 
-        KeyName: some
         SecurityGroups:
         - Ref: WebServerSecGroup
-        InstanceType: t3.medium
+        InstanceType: t3.micro
         BlockDeviceMappings:
         - DeviceName: "/dev/sdk"
           Ebs:
@@ -372,6 +405,12 @@ Outputs:
         Value: !Ref PrivateSubnet2
         Export:
           Name: !Sub ${EnvironmentName}-PRI2-SN  
+
+    LoadBalancerDNS:
+        Description: A reference to the load balancer DNS Name
+        Value: !Join [ "", [ 'http://', !GetAtt WebAppLB.DNSName ]]
+        Export:
+          Name: "DNS-URL" 
           
 # Sample UserData
 # When creating your Launch Configuration, you may need a UserData script
