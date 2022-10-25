@@ -10,4 +10,5 @@ For instance the `${EnvironmentName}` would be substituted with `UdacityProject`
 
 ### Running the code
 From VS Code terminal:  .\create.sh UdacityProject final-project-starter.yml server-parameters.json
-From GtiBash: bash create.sh UdacityProject final-project-starter.yml server-parameters.json
+
+From GitBash: bash create.sh UdacityProject final-project-starter.yml server-parameters.json
